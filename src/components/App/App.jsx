@@ -1,41 +1,42 @@
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addContact, deleteContact, selectContacts } from '../../redux/contactsSlice';
-import { changeFilter, selectNameFilter } from '../../redux/filtersSlice';
+import { fetchContacts, addContact, deleteContact } from '../../redux/contactsOps';
+import { selectContacts, selectLoading, selectError } from '../../redux/contactsSlice';
 import ContactForm from '../ContactForm/ContactForm';
 import ContactList from '../ContactList/ContactList';
 import SearchBox from '../SearchBox/SearchBox';
 import css from './App.module.css';
 
 const App = () => {
-    const dispatch = useDispatch();
-    const contacts = useSelector(selectContacts);
-    const filterValue = useSelector(selectNameFilter);
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+  const loading = useSelector(selectLoading);
+  const error = useSelector(selectError);
+  console.log("Contacts in App:", contacts);
   
-    const handleAddContact = ({ name, number }) => {
-        dispatch(addContact({ name, number }));
-    };
+  
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
-    const handleDeleteContact = (id) => {
-        dispatch(deleteContact(id));
-    };
+  const handleAddContact = (newContact) => {
+    dispatch(addContact(newContact)); 
+  };
 
-    const handleFilterChange = (event) => {
-        dispatch(changeFilter(event.target.value));
-    };
+  const handleDeleteContact = (id) => {
+    dispatch(deleteContact(id)); 
+  };
 
-    const filteredContacts = contacts.filter(contact =>
-        contact.name.toLowerCase().includes(filterValue.toLowerCase())
-    );
-
-    return (
-        <div>
-            <h1 className={css.title}>Phonebook</h1>
-            <ContactForm addContact={handleAddContact} />
-            <SearchBox filterValue={filterValue} handleContactSearch={handleFilterChange} />
-            <ContactList contacts={filteredContacts} deleteContact={handleDeleteContact} />
-        </div>
-    );
+  return (
+    <div>
+      <h1 className={css.title}>Phonebook</h1>
+      <ContactForm onAddContact={handleAddContact} />
+      <SearchBox />
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error}</p>}
+      <ContactList contacts={contacts} onDeleteContact={handleDeleteContact} />
+    </div>
+  );
 };
 
 export default App;
-
