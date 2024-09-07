@@ -9,7 +9,7 @@ export const fetchContacts = createAsyncThunk(
   'contacts/fetchAll',
   async (_, thunkAPI) => {
     try {
-        const response = await axios.get('https://66dabf4df47a05d55be5d008.mockapi.io/api/v1/contacts');
+        const response = await axios.get(API_URL);
         console.log(response.data);
         
       return response.data;
